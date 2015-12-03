@@ -1,4 +1,5 @@
 #!/bin/bash
+#脚本可以改名
 phone_num="XXX"
 host_ip=$(cat /etc/sysconfig/network-scripts/ifcfg-* | grep IPADDR | grep -v 127.0.0.1 | cut -d "=" -f 2 |  head -n 1 | cut -c 1-15)
 error_log_size=$(ls -lsh /usr/local/nginx/logs/error.log | awk '{print $6}')
@@ -9,11 +10,15 @@ log_num=100
 check_log () {
     for i in $(tail -n ${log_num} /usr/local/nginx/logs/access.log | awk '{print $9}'); do
         if [[ "$i" =~ ^[0-9]{3}$ ]];then
+#            echo "$i 匹配三位数字OK"
             if [[ $i -gt 400 ]]; then
                 ((++error_num))
+#                echo -e "\033[31m$i 出错+1 累计 ${error_num}\033[0m"
             fi
         else
-                ((--log_num))
+#            echo "$i 不是三位数字"
+            ((--log_num))
+#            echo "当前有效访问次数为 ${log_num}"
         fi
     done
 }
