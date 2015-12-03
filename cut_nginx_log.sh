@@ -1,7 +1,7 @@
 #!/bin/bash
 logs_path="/usr/local/nginx/logs/"
 pid_path="/usr/local/nginx/logs/nginx.pid"
-yesterday=$(date -d "yesterday" +%Y-%m-%d)
+yesterday=$(date -d "-1 day" +%Y-%m-%d)
 
 mv ${logs_path}access.log ${logs_path}access.log.${yesterday}
 mv ${logs_path}error.log ${logs_path}error.log.${yesterday}
