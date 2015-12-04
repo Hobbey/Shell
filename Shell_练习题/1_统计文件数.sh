@@ -50,7 +50,7 @@ mkdir -p ${yesterday}/{00..23}
 
 for i in {00..18}; do
     j=$(( ${i/#0} * 100 ))
-    for q in $(seq 1 $j); do
+    for q in $(seq -w 1 $j); do
         touch ${yesterday}/$i/file.$q
     done
 done
