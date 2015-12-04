@@ -1,15 +1,16 @@
 #!/bin/bash
 phone_num="XXX"
+nginx_path="/usr/local/nginx/logs/"
 host_ip=$(cat /etc/sysconfig/network-scripts/ifcfg-* | grep IPADDR | grep -v 127.0.0.1 | cut -d "=" -f 2 |  head -n 1 | cut -c 1-15)
-nginx_worker_processes=$(ps -ef | grep nginx | grep -v grep | wc -l)
-error_log_num=$(cat /usr/local/nginx/logs/error.log | wc -l)
-error_log_size=$(ls -lsh /usr/local/nginx/logs/error.log | awk '{print $6}')
+nginx_worker_processes=$(ps -ef | grep nginx | awk '{print $1}' | grep nginx | wc -l)
+error_log_num=$(cat ${nginx_path}/error.log | wc -l)
+error_log_size=$(ls -lsh ${nginx_path}/error.log | awk '{print $6}')
 #查询log数 预设值
 log_num=100
 
 check_log () {
     error_num=0
-    for i in $(tail -n ${log_num} /usr/local/nginx/logs/access.log | awk '{print $9}'); do
+    for i in $(tail -n ${log_num} ${nginx_path}/access.log | awk '{print $9}'); do
         if [[ "$i" =~ ^[0-9]{3}$ ]];then
 #            echo "$i 匹配三位数字OK"
             if [[ $i -gt 400 ]]; then
@@ -44,7 +45,7 @@ case $1 in
         echo "Nginx error.log:${error_log_num}/${error_log_size}"
         echo "Nginx error:${error_num}/${log_num}"
         echo "####################"
-        echo "$(tail -n ${log_num} /usr/local/nginx/logs/access.log | awk '{print $9}' | sort -n | uniq -c)"
+        echo "$(tail -n ${log_num} ${nginx_path}/access.log | awk '{print $9}' | sort -n | uniq -c)"
         ;;
 
     -h | --help)
@@ -68,9 +69,4 @@ chmod 700 /home/script/check_nginx_error.sh
 
 
 /home/script/check_nginx_error.sh -t
-cat /usr/local/nginx/logs/access.log | awk '{print $9}' | sort -n | uniq -c
-
-
-
-
 
