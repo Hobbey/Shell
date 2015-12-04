@@ -1,2 +1,2 @@
 # Shell
-scripts | long linux command | note | etc
+scripts | linux command pipe | note | etc
