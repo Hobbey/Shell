@@ -39,64 +39,84 @@ esac
 
 
 
-效果:
-[root@cloud01 2015-12-02]# pwd
-/home/script/2015-12-02
+测试:
 
-[root@cloud01 2015-12-02]# ll
-total 72
-drwxr-xr-x. 2 root root 32768 Dec  3 16:37 00
-drwxr-xr-x. 2 root root     6 Dec  3 14:37 01
-drwxr-xr-x. 2 root root     6 Dec  3 14:37 02
-drwxr-xr-x. 2 root root     6 Dec  3 14:37 03
-drwxr-xr-x. 2 root root     6 Dec  3 14:37 04
-drwxr-xr-x. 2 root root     6 Dec  3 14:37 05
-drwxr-xr-x. 2 root root     6 Dec  3 14:37 06
-drwxr-xr-x. 2 root root     6 Dec  3 14:37 07
-drwxr-xr-x. 2 root root     6 Dec  3 14:37 08
-drwxr-xr-x. 2 root root     6 Dec  3 14:37 09
-drwxr-xr-x. 2 root root    86 Dec  3 14:13 10
-drwxr-xr-x. 2 root root     6 Dec  3 14:37 11
-drwxr-xr-x. 2 root root    35 Dec  3 14:12 12
-drwxr-xr-x. 2 root root     6 Dec  3 14:37 13
-drwxr-xr-x. 2 root root     6 Dec  3 14:37 14
-drwxr-xr-x. 2 root root     6 Dec  3 14:37 15
-drwxr-xr-x. 2 root root     6 Dec  3 14:37 16
-drwxr-xr-x. 2 root root     6 Dec  3 14:37 17
-drwxr-xr-x. 2 root root     6 Dec  3 14:37 18
-drwxr-xr-x. 2 root root  8192 Dec  3 15:35 19
-drwxr-xr-x. 2 root root     6 Dec  3 14:37 20
-drwxr-xr-x. 2 root root     6 Dec  3 14:37 21
-drwxr-xr-x. 2 root root     6 Dec  3 14:37 22
-drwxr-xr-x. 2 root root     6 Dec  3 14:37 23
+生成测试环境的脚本:
+#!/bin/bash
+yesterday=$(date -d "-1 day" +%Y-%m-%d)
 
-[root@cloud01 script]# ./aa.sh -t
-2015-12-02统计情况:
-folder	Lost Files
+cd /home/script/
+mkdir -p ${yesterday}/{00..23}
+
+for i in {00..18}; do
+    j=$(( ${i/#0} * 100 ))
+    for q in $(seq 1 $j); do
+        touch ${yesterday}/$i/file.$q
+    done
+done
+
+
+[root@cloud01 2015-12-03]# pwd
+/home/script/2015-12-03
+
+[root@cloud01 2015-12-03]# ll
+total 808
+drwxr-xr-x. 2 root root     6 Dec  4 15:14 00
+drwxr-xr-x. 2 root root  4096 Dec  4 15:14 01
+drwxr-xr-x. 2 root root  8192 Dec  4 15:14 02
+drwxr-xr-x. 2 root root  8192 Dec  4 15:14 03
+drwxr-xr-x. 2 root root 12288 Dec  4 15:14 04
+drwxr-xr-x. 2 root root 12288 Dec  4 15:14 05
+drwxr-xr-x. 2 root root 16384 Dec  4 15:14 06
+drwxr-xr-x. 2 root root 20480 Dec  4 15:14 07
+drwxr-xr-x. 2 root root 20480 Dec  4 15:14 08
+drwxr-xr-x. 2 root root 24576 Dec  4 15:14 09
+drwxr-xr-x. 2 root root 24576 Dec  4 15:14 10
+drwxr-xr-x. 2 root root 28672 Dec  4 15:14 11
+drwxr-xr-x. 2 root root 32768 Dec  4 15:14 12
+drwxr-xr-x. 2 root root 32768 Dec  4 15:14 13
+drwxr-xr-x. 2 root root 36864 Dec  4 15:14 14
+drwxr-xr-x. 2 root root 36864 Dec  4 15:14 15
+drwxr-xr-x. 2 root root 40960 Dec  4 15:14 16
+drwxr-xr-x. 2 root root 45056 Dec  4 15:14 17
+drwxr-xr-x. 2 root root 45056 Dec  4 15:14 18
+drwxr-xr-x. 2 root root     6 Dec  4 15:14 19
+drwxr-xr-x. 2 root root     6 Dec  4 15:14 20
+drwxr-xr-x. 2 root root     6 Dec  4 15:14 21
+drwxr-xr-x. 2 root root     6 Dec  4 15:14 22
+drwxr-xr-x. 2 root root     6 Dec  4 15:14 23
+
+[root@cloud01 2015-12-03]# ll 15/file.
+Display all 1500 possibilities? (y or n)
+
+
+[root@cloud01 script]# ./bb.sh -t
+2015-12-03统计情况:
+Folder	Lost Files
 ------	----------
-00	478
-01	1800
-02	1800
-03	1800
-04	1800
-05	1800
-06	1800
-07	1800
-08	1800
-09	1800
-10	1793
-11	1800
-12	1797
-13	1800
-14	1800
-15	1800
-16	1800
-17	1800
-18	1800
-19	1567
-20	1800
-21	1800
-22	1800
-23	1800
-丢失文件总数:41635
+00	    1800
+01	    1700
+02	    1600
+03	    1500
+04	    1400
+05	    1300
+06  	1200
+07	    1100
+08	    1000
+09  	900
+10  	800
+11  	700
+12  	600
+13  	500
+14	    400
+15  	300
+16  	200
+17	    100
+18	    0
+19  	1800
+20	    1800
+21	    1800
+22	    1800
+23	    1800
+丢失文件总数:26100
 
