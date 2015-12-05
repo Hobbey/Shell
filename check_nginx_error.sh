@@ -9,6 +9,7 @@ check_log () {
     for i in $(tail -n ${tail_log_num} ${nginx_path}/access.log | awk '{print $9}'); do
         if [[ "$i" =~ ^[0-9]{3}$ ]];then
     #        echo "$i 匹配三位数字OK"    #"#"号在for内,去掉注释跟踪循环内步骤
+            #if [[ $i -gt 400 ]]; then
             if [[ $i =~ 404 || $i =~  50* ]]; then
                 ((++http_error_num))
     #           echo -e "\033[31m$i 出错+1 累计 ${http_error_num}\033[0m"
