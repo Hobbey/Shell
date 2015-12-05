@@ -6,23 +6,27 @@ nginx_worker_processes=$(ps -ef | grep nginx | awk '{print $1}' | grep nginx | w
 error_log_num=$(cat ${nginx_path}/error.log | wc -l)
 error_log_size=$(ls -lsh ${nginx_path}/error.log | awk '{print $6}')
 #查询log数 预设值
-log_num=100
+tail_log_num=100
 
 check_log () {
-    error_num=0
-    for i in $(tail -n ${log_num} ${nginx_path}/access.log | awk '{print $9}'); do
+    http_error_num=0
+    for i in $(tail -n ${tail_log_num} ${nginx_path}/access.log | awk '{print $9}'); do
         if [[ "$i" =~ ^[0-9]{3}$ ]];then
 #            echo "$i 匹配三位数字OK"
             if [[ $i -gt 400 ]]; then
-                ((++error_num))
-#                echo -e "\033[31m$i 出错+1 累计 ${error_num}\033[0m"
+                ((++http_error_num))
+#                echo -e "\033[31m$i 出错+1 累计 ${http_error_num}\033[0m"
             fi
         else
 #            echo "$i 不是三位数字"
-            ((--log_num))
-#            echo "当前有效访问次数为 ${log_num}"
+            ((--tail_log_num))
+#            echo "当前有效访问次数为 ${tail_log_num}"
         fi
     done
+    a="${HOSTNAME}:${host_ip}"
+    b="Nginx_processes:${nginx_worker_processes}"
+    c="Nginx_error.log:${error_log_num}/${error_log_size}"
+    d="HTTP_error:${http_error_num}/${tail_log_num}"
 }
 
 usage () {
@@ -36,16 +40,16 @@ usage () {
 case $1 in
     -t)
         if [[ "$2" =~ ^[0-9]+$ ]]; then
-            log_num=$2
+            tail_log_num=$2
         fi
         check_log
         echo "Phone:${phone_num}"
-        echo "${HOSTNAME}:${host_ip}"
-        echo "Nginx processes:${nginx_worker_processes}"
-        echo "Nginx error.log:${error_log_num}/${error_log_size}"
-        echo "Nginx error:${error_num}/${log_num}"
+        echo "$a"
+        echo "$b"
+        echo "$c"
+        echo "$d"
         echo "####################"
-        echo "$(tail -n ${log_num} ${nginx_path}/access.log | awk '{print $9}' | sort -n | uniq -c)"
+        echo "$(tail -n ${tail_log_num} ${nginx_path}/access.log | awk '{print $9}' | sort -n | uniq -c)"
         ;;
 
     -h | --help)
@@ -54,8 +58,8 @@ case $1 in
 
     *)  #错误数大于等于20,错误日志大于等于10万.nginx没有启动,三个条件满足一个就发短信
         check_log
-        if [[ error_num -ge 20 || error_log_num -ge 100000 || nginx_worker_processes -eq 0 ]]; then
-            wget --post-data "phone=${phone_num}&content= ${HOSTNAME}:${host_ip},Nginx processes:${nginx_worker_processes},Nginx error.log:${error_log_num}/${error_log_size},Nginx error:${error_num}/${log_num} &ac=send" http://sms-url
+        if [[ http_error_num -ge 20 || error_log_num -ge 100000 || nginx_worker_processes -eq 0 ]]; then
+            wget --post-data "phone=${phone_num}&content=$a,$b,$c,$d&ac=send" http://sms-url
         fi
         ;;
 esac
