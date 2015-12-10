@@ -30,7 +30,7 @@ check_jboss_running () {
 
 jboss_start () {
     if [[ $check_jboss_running_status -eq 1 ]]; then #避免重复启动
-        echo "Jboss is running"
+        echo "${JBOSS_DIR} is running" #区分一台机器上的多个jboss
         exit 1
     else
         cd ${JBOSS_DIR}/bin/
@@ -42,14 +42,14 @@ jboss_start () {
 
 jboss_stop () {
     if [[ $check_jboss_running_status -eq 0 ]]; then #加不加没用,获取不到pid,顶多kill命令报个错而已
-        echo "Jboss already stoped"
+        echo "${JBOSS_DIR} already stoped"
         exit 1
     else
         ps -ef | grep "${JBOSS_DIR}" | grep -v "grep" | awk '{print $2}' | xargs -i kill -9 {}
-        echo "Jboss is killed"
+        echo "${JBOSS_DIR} is killed"
         rm -rf ${JBOSS_DIR}/standalone/tmp/vfs/temp*
         rm -rf ${JBOSS_DIR}/standalone/tmp/vfs/deployment*
-        echo "clear jboss tmp file OK"
+        echo "clear ${JBOSS_DIR} tmp file OK"
         mv ${JBOSS_DIR}/bin/nohup.out ${JBOSS_DIR}/bin/nohup.out.${DATE}
         echo "mv nohup.out nohup.out.${DATE}"
         sleep 2
@@ -60,7 +60,7 @@ jboss_stop () {
 jboss_update () {
     if [[ -f ${FILE_DIR}/${FILE_NAME} ]]; then
         if [[ $check_jboss_running_status -eq 1 ]]; then
-            echo "Jboss is running"
+            echo "${JBOSS_DIR} is running"
             exit 1
         fi
         mv ${JBOSS_DIR}/standalone/deployments/${FILE_NAME} ${BACKUP_DIR}/${FILE_NAME}.${DATE}
@@ -75,7 +75,7 @@ jboss_update () {
 jboss_rollback () {
     if [[ -f ${BACKUP_DIR}/"$1" ]]; then
         if  [[ $check_jboss_running_status -eq 1 ]]; then
-            echo "Jboss is running"
+            echo "${JBOSS_DIR} is running"
             exit 1
         fi
         mv ${JBOSS_DIR}/standalone/deployments/${FILE_NAME} ${BACKUP_DIR}/${FILE_NAME}.${DATE}.rbak #代表这个版本可能有问题,不然也不会回滚
@@ -107,7 +107,7 @@ case $1 in
         ;;
     -t)
         if [[ $check_jboss_running_status -eq 0 ]]; then
-            echo "Jboss stoped"
+            echo "${JBOSS_DIR} stoped"
             exit
         fi
         if [[ "$2" == "-f" ]]; then
@@ -133,3 +133,31 @@ chmod 700 /home/script/Jboss7_control.sh
 #
 #EOF
 
+
+
+TEST:
+[root@cloud1 script]# ./Jboss7_control_push1.sh 
+use Jboss7_control_push1.sh -h for help
+
+[root@cloud1 script]# ./Jboss7_control_push1.sh -h
+Jboss7_control_push1.sh:
+1 | start                    :jboss_start
+2 | stop                     :jboss_stop
+3 | update                   :jboss_update
+4 | rollback                 :list old version
+4 | rollback old_version     :jboss_rollback old_version
+-t                           :tail nohup.out
+-t -f                        :tail -f nohup.out
+-h                           :help info
+
+[root@cloud1 script]# ./Jboss7_control_push1.sh 1
+Jboss is running
+
+[root@server176 script]# ./Jboss7_control_push1.sh start
+Jboss is running
+
+[root@cloud1 script]# ./Jboss7_control_push1.sh 4
+22M -rw-r--r-- 1 root root 22M 11-19 18:08 /usr/local/jboss-as-7.1.1.Final1/standalone/appStoreNew.war.2015-12-07_16_59_53
+
+[root@cloud1 script]# ./Jboss7_control_push1.sh 4 appStoreNew.war.2015-12-07_16_59_53
+Jboss is running
