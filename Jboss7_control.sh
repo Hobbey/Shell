@@ -64,6 +64,7 @@ jboss_update () {
             exit 1
         fi
         mv ${JBOSS_DIR}/standalone/deployments/${FILE_NAME} ${BACKUP_DIR}/${FILE_NAME}.${DATE}
+        echo "backup ${FILE_NAME} to ${BACKUP_DIR}/${FILE_NAME}.${DATE}"
         cp ${FILE_DIR}/${FILE_NAME} ${JBOSS_DIR}/standalone/deployments/
         echo "cp ${FILE_DIR}/${FILE_NAME} to ${JBOSS_DIR}/standalone/deployments/ OK"
     else
@@ -77,7 +78,8 @@ jboss_rollback () {
             echo "Jboss is running"
             exit 1
         fi
-        mv ${JBOSS_DIR}/standalone/deployments/${FILE_NAME} ${BACKUP_DIR}/${FILE_NAME}.${DATE}
+        mv ${JBOSS_DIR}/standalone/deployments/${FILE_NAME} ${BACKUP_DIR}/${FILE_NAME}.${DATE}.rbak #代表这个版本可能有问题,不然也不会回滚
+        echo "backup ${FILE_NAME} to ${BACKUP_DIR}/${FILE_NAME}.${DATE}.rbak"
         cp ${BACKUP_DIR}/$1 ${JBOSS_DIR}/standalone/deployments/${FILE_NAME}
         echo "rollback $1 OK"
     else
@@ -116,13 +118,18 @@ case $1 in
         ;;
     *)
         echo "use $(basename $0) -h for help"
+        ;;
 esac
 
 
 
-vim /home/script/Jboss_control.sh
+vim /home/script/Jboss7_control.sh
+chmod 700 /home/script/Jboss7_control.sh
 
-
-chown jboss:jboss ${FILE_DIR}/${FILE_NAME}
-su jboss -c 'nohup ./standalone.sh >> nohup.out 2>&1 &'
+#因为老旧服务器用户和文件权限不统一的问题,暂时都用root启动,以后改进
+#chown jboss:jboss ${FILE_DIR}/${FILE_NAME}
+#su jboss -c 'nohup ./standalone.sh >> nohup.out 2>&1 &'
+#su - jboss < EOF
+#
+#EOF
 
