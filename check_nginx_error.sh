@@ -10,18 +10,11 @@ check_log () {
     
     #####计算A
     check_log_http_error_num=0
-    for i in $(tail -n ${tail_log_num} ${nginx_path}/access.log | awk '{print $9}'); do
-        if [[ "$i" =~ ^[0-9]{3}$ ]];then
-    #        echo "$i 匹配三位数字OK"    #"#"号在for内,去掉注释跟踪循环内步骤
-            #if [[ $i -gt 400 ]]; then
-            if [[ $i =~ 404 || $i =~  50* ]]; then
-                ((++check_log_http_error_num))
-    #           echo -e "\033[31m$i 出错+1 累计 ${check_log_http_error_num}\033[0m"
-            fi
-        else
-    #        echo "$i 不是三位数字"
-            ((--tail_log_num))
-    #        echo "当前有效访问次数为 ${tail_log_num}"
+    for i in $(tail -n ${tail_log_num} ${nginx_path}/access.log | awk -F \" '{print $3}' | awk '{print $1}'); do #新获取方式 可以百分百确定 获取到的是 http状态码
+        #if [[ $i -gt 400 ]]; then
+        if [[ $i =~ 404 || $i =~  50* ]]; then
+            ((++check_log_http_error_num))
+        #   echo -e "\033[31m$i 出错+1 累计 ${check_log_http_error_num}\033[0m"
         fi
     done
     ###计算A的输出 3个#
@@ -68,7 +61,7 @@ case $1 in
     *)  #错误数大于等于20,错误日志大于等于10万.nginx没有启动,三个条件满足一个就发短信
         check_log
         if [[ check_log_http_error_num -ge 20 || check_log_error_log_num -ge 100000 || check_log_nginx_worker_processes -eq 0 ]]; then
-            wget --post-data "phone=${phone_num}&content=${check_log_output_b},${check_log_output_c},${check_log_output_d},${check_log_output_a},$a&ac=send" sms-url
+            wget --post-data "phone=${phone_num}&content=${check_log_output_b},${check_log_output_c},${check_log_output_d},${check_log_output_a},$a&ac=send" http://sms-url
         fi
         ;;
 esac
