@@ -2,7 +2,7 @@
 
 ---
 ###`( )`
-*   命令组-子Shell
+*   命令组-子Shell  
     括号中的命令将会新开一个`子shell`顺序执行,注意子Shell变量
     括号中多个命令之间用分号隔开,最后一个命令可以没有分号,各命令和括号之间不必有空格
     (command;command;command;command)
