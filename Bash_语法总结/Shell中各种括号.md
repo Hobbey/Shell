@@ -3,22 +3,22 @@
 ---
 ###`( )`
 *   命令组-子Shell  
-    括号中的命令将会新开一个`子shell`顺序执行,注意子Shell变量
-    括号中多个命令之间用分号隔开,最后一个命令可以没有分号,各命令和括号之间不必有空格
+    括号中的命令将会新开一个`子shell`顺序执行,注意子Shell变量  
+    括号中多个命令之间用分号隔开,最后一个命令可以没有分号,各命令和括号之间不必有空格  
     (command;command;command;command)
-*   命令 管道 替换
+*   命令 管道 替换  
     \$(command) 等同于 \`command\`
-*   用于初始化数组
+*   用于初始化数组  
     array=(a b c d)
 
 ---
 ###`(( 为整数设计 ))`
-变量不用加\$
+变量不用加$
 
-1.  完成(( ... ))内的整型算式,得到算式结果
+1.  完成(( ... ))内的整型算式,得到算式结果  
     支持 `+ - * / %` 以及仅对变量生效的:`++ --`
 
-    ```
+    ```shell
 [root@cloud01 script]# ((2+2)) #完成一个计算
 [root@cloud01 script]# echo $(( (2+3) * 4 ))
 20
@@ -40,10 +40,10 @@
 24
     ```
 
-1.  完成(( ... ))内的整型判断,得到`$?`
+1.  完成(( ... ))内的整型判断,得到`$?`  
     支持 `> >=  < <=  == !=`
 
-    ```
+    ```shell
 [root@cloud01 script]# a=6 ;if (( a > 5 && a < 9 ));then echo $a ;fi #正确形式
 6
 [root@cloud01 script]# a=6 ;if ((a>5&&a<9));then echo $a ;fi #可以没有多余空格
@@ -63,11 +63,11 @@ $a is even.
 2
     ```
 
-1.  判断算式的结果,得到 `\$?`  ~~个人很少用~~
-    结果 `= 0` 则 \$?为1 即为假
+1.  判断算式的结果,得到 `\$?`  ~~个人很少用~~  
+    结果 `= 0` 则 \$?为1 即为假  
     结果 `! = 0` 则 \$?为0 即为真
 
-    ```
+    ```shell
 [root@cloud01 script]# if (( 0 )) ; then echo "True" ; else echo "False" ; fi
 False
 [root@cloud01 script]# if (( 2 - 1 )) ; then echo "True" ; else echo "False" ; fi
@@ -80,16 +80,16 @@ True
 
 ---
 ###`[ ]`
-变量需要加\$
+变量需要加$
 
-1.  [ 等价于 bash的内部命令 "test"
-    if/test结构中的 "[" 是调用test命令的标识，"]" 是关闭条件判断
-    文件判断: `-e -d 等`
-    字符串比较: `== !=`
-    整数比较: ` -eq 型 `
-    逻辑与或: `-a -o`
+1.  [ 等价于 bash的内部命令 "test"  
+    if/test结构中的 "[" 是调用test命令的标识，"]" 是关闭条件判断  
+    文件判断: `-e -d 等`  
+    字符串比较: `== !=`  
+    整数比较: ` -eq 型 `  
+    逻辑与或: `-a -o`  
 
-    ```
+    ```shell
 个人认为可以废弃,不如 [[ ]] 型好用,语法还容易混
 [root@cloud01 script]# a=6 ; if [ a -gt 5 ] ; then echo ok ; fi
 -bash: [: a: integer expression expected
@@ -109,13 +109,13 @@ file exists
 
 1.  正则通配符
 
-    ```
+    ```shell
 grep -h '^[A-Za-z0-9]' dirlist*.txt
     ```
 
 1.  数组索引
 
-    ```
+    ```shell
 [root@cloud01 script]# a[0]=test ; echo ${a[0]}
 test
     ```
@@ -126,10 +126,10 @@ test
 
 [[ 是 bash 程序语言的关键字。并不是一个命令, [[ ]] 结构比[ ]结构更加通用。
 
-*   文件判断
+*   文件判断  
     支持`-e -f -d`等,详见附表
 
-    ```
+    ```shell
 [root@cloud01 script]# touch aa.txt 
 [root@cloud01 script]# if [[ -e aa.txt ]];then echo "True" ;fi
 True
@@ -146,10 +146,10 @@ file not exists
 file not exists
     ```
 
-*   字符串判断
+*   字符串判断  
     支持`-n -z > ==`等,详见附表
 
-    ```
+    ```shell
 [root@cloud01 script]# a='abc' ; if [[ -n "$a" ]] ; then echo OK ; else echo "Error" ;fi
 OK
 [root@cloud01 script]# a='abc' ; if [[ -z "$a" ]] ; then echo OK ; else echo "Error" ;fi
