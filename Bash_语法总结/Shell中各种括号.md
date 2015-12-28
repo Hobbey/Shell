@@ -30,7 +30,7 @@
 6.  [其他] (#jump6)
     1.  [定义函数] (#jump61)
 
-
+---
 <h3 id="jump1">( )</h3>
 
 <h4 id="jump11">命令或管道替换</h4>
@@ -155,6 +155,7 @@ $a is even.
 [root@cloud01 script]# if (( foo = 5 ));then echo "It is true"; fi #这里是赋值,不是判断,所以永远成功,且赋值为5
 It is true
 ```
+
 <h4 id="jump23">判断算式的结果是否为0</h4>
 
 判断算式的结果,得到 `$?`
@@ -171,9 +172,9 @@ False
 [root@cloud01 script]# if (( 2 - 3 )) ; then echo "True" ; else echo "False" ; fi
 True
 ```
+
 <h4 id="jump24">其他用法</h4>
 
- 
 与for合用
 
 ```shell
@@ -383,7 +384,7 @@ bbb
 1
 [root@cloud01 script]# c=ccc ; echo ${c:?error CCC}
 ccc
-    ```
+```
     
 `${parameter:+word}`  
 若变量没有设置或者为空,展开结果为空  
@@ -533,8 +534,6 @@ AAA
 AAA
 ```
 
-
-
 ---
 <h3 id="jump6">其他</h3>
 
@@ -553,4 +552,3 @@ function name {
     return
 }
 ```
-
