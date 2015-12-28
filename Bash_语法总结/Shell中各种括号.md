@@ -293,12 +293,12 @@ bbb
     若变量不为空,则正常展开
     
     ```shell
-[root@cloud01 script]# echo ${c:?error ccccc}
--bash: c: error ccccc
+[root@cloud01 script]# echo ${c:?error CCC}
+-bash: c: error CCC
 [root@cloud01 script]# echo $?
 1
-[root@cloud01 script]# c=CCC ; echo ${c:?error ccccc}
-CCC
+[root@cloud01 script]# c=ccc ; echo ${c:?error CCC}
+ccc
     ```
     
     `${parameter:+word}`  
@@ -313,9 +313,92 @@ Y
 DDD
     ```
 
+*   返回变量名的参数展开  
+    shell 具有返回变量名的能力  
+    `${!prefix*}` 等同于 `${!prefix@}`  
+    这种展开会返回以 prefix 开头的已有变量名
 
-*   变量值替换
-*   变量提取字符
+    ```shell
+[root@cloud01 script]# aaa1=1
+[root@cloud01 script]# aaa2=2
+[root@cloud01 script]# echo ${!aaa*}
+aaa1 aaa2
+    ```
+
+*   字符串展开
+
+    `${#parameter}`  
+    展开成由 parameter 所包含的字符串的长度  
+    如果parameter 是 `@` 或者是 `*` 的话，则展开结果是位置参数的个数  
+
+    ```shell
+[root@cloud01 script]# a="123456 78" ; echo ${#a}
+9
+[root@cloud01 script]# test () {
+> echo ${#@}
+> }
+[root@cloud01 script]# test 1 1 1 1
+4
+    ```
+
+*   字符串提取  
+
+    `${parameter:offset}`  
+    `${parameter:offset:length}`  
+    从 parameter 所包含的字符串中提取一部分字符  
+    提取的字符`始于第 offset 个字符`（从字符串开头算起）直到字符串的末尾，或指定提取的长度 length  
+    若 offset 的值为`负数`，则认为 offset 值是从字符串的末尾开始算起,截取方向仍然是向后  
+    注意: 负数前面必须有一个空格 为防止与 ${parameter:-word} 展开形式混淆  
+    length，若出现则必须不能小于零  
+    如果 parameter 是 `@`，展开结果是 length 个位置参数，从`第 offset 个`位置参数开始 截取 length 个位置参数结束
+
+    ```shell
+[root@cloud01 script]# a=123456789 ; echo ${a:2}
+3456789
+[root@cloud01 script]# a=123456789 ; echo ${a:2:2} #起始于第二个字符,但是不包括第二个字符
+34
+[root@cloud01 script]# a=123456789 ; echo ${a: -2:1}
+8
+[root@cloud01 script]# a=123456789 ; echo ${a: -2:2}
+89
+[root@cloud01 script]# a=123456789 ; echo ${a: -2:3}
+89
+[root@cloud01 script]# test () {
+> echo ${@:2:3}
+> }
+[root@cloud01 script]# test 11111 22222 33333 44444 55555 66666 #包括第二个位置变量
+22222 33333 44444
+    ```
+
+*   字符串部分删除  
+    \# 号 在键盘上 $ 之前, % 在 $ 之后  
+    
+    `${parameter#pattern}`  
+    `${parameter##pattern}`  
+    这种展开会从 paramter 所包含的字符串中删除`开头`一部分文本，删除的文本匹配 patten, pattern 是通配符模式(路径名展开)  
+    \# 清除最短的匹配结果 而 \#\# 模式清除最长的匹配结果  
+
+    `${parameter%pattern}`  
+    `${parameter%%pattern}`  
+    这种展开会从 paramter 所包含的字符串中删除`末尾`一部分文本，删除的文本匹配 patten, pattern 是通配符模式(路径名展开)  
+    % 清除最短的匹配结果 而 %% 模式清除最长的匹配结果
+
+    ```shell
+[root@cloud01 script]# a=file.tar.bz2 ; echo ${a#*.} #匹配到"file." ,删除开头部分
+tar.bz2
+[root@cloud01 script]# a=file.tar.bz2 ; echo ${a##*.} #匹配到"file.tar." ,删除开头部分
+bz2
+[root@cloud01 script]# a=file.tar.bz2 ; echo ${a%.*} #匹配到".bz2" ,删除末尾部分
+file.tar
+[root@cloud01 script]# a=file.tar.bz2 ; echo ${a%%.*} # 匹配到".tar.bz2" ,删除末尾部分
+file
+    ```
+
+*   字符串查找替换  
+    
+
+
+
 
 ---
 ###其他
