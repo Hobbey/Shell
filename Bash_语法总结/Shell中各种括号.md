@@ -207,7 +207,7 @@ test
 需要留空格,即[[ expression ]],而[[ expression]] 是语法错误  
 匹配字符串或通配符不需要引号  
 支持正则  
-[[是 bash 程序语言的关键字。并不是一个命令
+[[ 是bash语言的关键字。并不是一个命令
 
 *   在 "[ ]" 结构的基础上,增加字符串支持正则,用于参数验证等  
     string `=~` regex
@@ -230,9 +230,90 @@ Y
 ---
 ###`{ }`
 
-*   展开
-*   组命令
-*   变量预设
+*   花括号/大括号展开  
+    大括号中，不允许有空白  
+    以`逗号`分割 或以`..`分割
+
+    ```shell
+[root@cloud01 script]# ls [124].txt
+1.txt  2.txt  4.txt
+[root@cloud01 script]# ls {1,2,4}.txt
+1.txt  2.txt  4.txt
+[root@cloud01 script]# ls {1..4}.txt
+1.txt  2.txt  3.txt  4.txt
+    ```
+
+*   基本变量  
+    若变量名与其他文本相邻,则可界定变量名范围  
+    访问第十一个位置参数：${11}
+
+    ```shell
+[root@cloud01 script]# a="AAA" ; echo "${a}_file"
+AAA_file
+    ```
+
+*   组命令  
+    大括号里的组命令不会新开一个子shell运行  
+    大括号与命令之间必须有一个空格，并且最后一个命令必须用一个分号或者一个换行符终止  
+    { command1; command2; command3; }
+
+*   处理不存在和空变量的参数展开  
+    用于解决丢失的位置参数和给参数指定默认值
+
+    `${parameter:=word}`  
+    若变量没有设置或者为空，则展开结果是 word 的值,`并把word赋值给变量`  
+    若变量不为空,则正常展开  
+    注：位置参数或其它的特殊参数不能以这种方式赋值
+    
+    ```shell
+[root@cloud01 script]# a=   #变量a为空
+[root@cloud01 ~]# echo ${a:=AAA}
+AAA
+[root@cloud01 script]# echo $a #赋值
+AAA
+[root@cloud01 ~]# a=aaa ; echo ${a:=AAA}  #变量不为空 正常展开
+aaa
+    ```
+
+    `${parameter:-word}`  
+    若变量没有设置或者为空，则展开结果是 word 的值,但是`不对变量赋值`
+    
+    ```shell
+[root@cloud01 script]# b=
+[root@cloud01 script]# echo ${b:-BBB}
+BBB
+[root@cloud01 script]# [[ -z "$b" ]] && echo Y || echo N #不赋值,变量仍为空
+Y
+[root@cloud01 script]# b=bbb ; echo ${b:-BBB}   #变量不为空 正常展开
+bbb
+    ```
+
+    `${parameter:?word}`  
+    若变量没有设置或者为空，这种展开导致脚本带有错误退出，并且 word 的内容会发送到标准错误  
+    若变量不为空,则正常展开
+    
+    ```shell
+[root@cloud01 script]# echo ${c:?error ccccc}
+-bash: c: error ccccc
+[root@cloud01 script]# echo $?
+1
+[root@cloud01 script]# c=CCC ; echo ${c:?error ccccc}
+CCC
+    ```
+    
+    `${parameter:+word}`  
+    若变量没有设置或者为空,展开结果为空  
+    若变量不为空,展开结果用word的值替换变量自身的值,但是不对变量赋值
+    
+    ```shell
+[root@cloud01 script]# d= #变量为空
+[root@cloud01 script]# [[ -z "${e:+DDD}" ]] && echo Y || echo N #变量展开为空
+Y
+[root@cloud01 script]# d=ddd ; echo ${d:+DDD} #变量非空  则用word替换
+DDD
+    ```
+
+
 *   变量值替换
 *   变量提取字符
 
