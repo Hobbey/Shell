@@ -3,7 +3,7 @@
 ###`( )`
 
 *   命令或管道替换  
-    用命令或管道执行的结果,代替 $( ) 结构  
+    加$表示 用命令或管道执行的结果,代替 $( ) 结构  
     $(command) 等同于 \`command\`
 
     ```shell
@@ -59,8 +59,11 @@ d
 为整数设计
 
 *   整型计算器  
-    支持 `+ - * / % ( )` 以及仅对变量生效的:`++ --`  
-    用计算的结果代替 $(( )) 结构
+    支持 `+ - * / ** % ( )`  
+    以及仅对变量生效的:`+= -= *= /= %= ++a --a a++ a--` 均等价于 parameter = parameter + value 形式  
+    支持位运算符 `~ << >> & | ^`  
+    支持不同进制计算 `base#number` 表示number 以 base 为底  
+    加$表示用计算的结果代替 $(( )) 结构
 
     ```shell
 [root@cloud01 script]# ((2+2)) #完成一个计算
@@ -76,12 +79,28 @@ d
 [root@cloud01 script]# a=6 ; echo $((++a));echo $a #先自加,后完成命令
 7
 7
+[root@cloud01 script]# a=6; echo $(( a+=2 ))
+8
+[root@cloud01 script]# echo $((11)) #默认十进制
+11
+[root@cloud01 script]# echo $((011)) #以0开头的数字,被认为是八进制
+9
+[root@cloud01 script]# echo $((0x11)) #十六进制
+17
 [root@cloud01 script]# echo $((16#10)) #不同进制运算,结果自动转为十进制
 16
 [root@cloud01 script]# echo $((16#10 + 1))
 17
 [root@cloud01 script]# echo $((16#10 + 8#10))
 24
+[root@cloud01 script]# for ((i=0;i<7;++i)); do echo $((1<<i)); done #位运算产生2的幂列表
+1
+2
+4
+8
+16
+32
+64
     ```
 
 *   整型判断  
@@ -95,6 +114,8 @@ True
 True
 [root@cloud01 script]# a=6 ; if (( ((a%2)) == 0 )) ; then echo "\$a is even." ; else echo "\$a is odd." ; fi #运算双引号 嵌在 判断双引号 里
 $a is even.
+[root@cloud01 script]# if (( foo = 5 ));then echo "It is true"; fi #这里是赋值,不是判断,所以永远成功,且赋值为5
+It is true
     ```
 
 *   判断算式的结果,得到 `$?`
@@ -120,6 +141,17 @@ True
 0
 1
 2
+    ```
+
+    某种逻辑运算
+    expr1?expr2:expr3 条件（三元）运算符。若表达式 expr1 的计算结果为非零值（算术真），则执行表达式 expr2，否则执行表达式 expr3
+    
+    ```shell
+[root@cloud01 script]# a=0 ; ((a<1?(a+=1):(a-=1))) ; echo $a
+1
+[root@cloud01 script]# a=0 ; ((a<1?a+=1:a-=1)) ; echo $a #在表达式内执行赋值,要把赋值表达式用括号括起来,不然报错
+-bash: ((: a<1?a+=1:a-=1: attempted assignment to non-variable (error token is "-=1")
+1
     ```
 
 ---
@@ -197,8 +229,8 @@ A
     遍历数组: a[@] 或 a[*]
 
     ```shell
-[root@cloud01 script]# a[0]=test ; echo ${a[@]}
-test
+[root@cloud01 script]# a[0]=aaaa ; echo ${a[@]}
+aaaa
     ```
 
 ---
@@ -334,10 +366,10 @@ aaa1 aaa2
     ```shell
 [root@cloud01 script]# a="123456 78" ; echo ${#a}
 9
-[root@cloud01 script]# test () {
+[root@cloud01 script]# lab () {
 > echo ${#@}
 > }
-[root@cloud01 script]# test 1 1 1 1
+[root@cloud01 script]# lab 1 1 1 1
 4
     ```
 
@@ -363,10 +395,10 @@ aaa1 aaa2
 89
 [root@cloud01 script]# a=123456789 ; echo ${a: -2:3}
 89
-[root@cloud01 script]# test () {
+[root@cloud01 script]# lab () {
 > echo ${@:2:3}
 > }
-[root@cloud01 script]# test 11111 22222 33333 44444 55555 66666 #包括第二个位置变量
+[root@cloud01 script]# lab 11111 22222 33333 44444 55555 66666 #包括第二个位置变量
 22222 33333 44444
     ```
 
@@ -395,19 +427,73 @@ file
     ```
 
 *   字符串查找替换  
-    
+    类似sed,但是sed是外部命令,减少使用外部命令可以减少脚本的运行时间  
 
+    `${parameter/pattern/string}`  
+    `${parameter//pattern/string}`  
+    `${parameter/#pattern/string}`  
+    `${parameter/%pattern/string}`  
+    这种形式的展开对 parameter 的内容执行`查找和替`换操作。如果找到了匹配通配符 pattern的文本，则用 string 的内容替换它。
+    在 `/` 形式下，只有第一个匹配项会被替换掉。在 `//` 形式下，所有的匹配项都会被替换掉。
+    该 `/#` 要求匹配项出现在字符串的开头，而 `/%` 要求匹配项出现在字符串的末尾。
+    `/string` 可能会省略掉，这样会导致`删除`匹配的文本。
+
+    ```shell
+[root@cloud01 script]# a=AAA.AAA.AAA ; echo ${a/AAA/aaa} #替换pattern匹配到的第一个
+aaa.AAA.AAA
+[root@cloud01 script]# a=AAA.AAA.AAA ; echo ${a//AAA/aaa} #替换全部
+aaa.aaa.aaa
+[root@cloud01 script]# a=AAA.AAA.AAA ; echo ${a/#AAA/aaa} #替换开头
+aaa.AAA.AAA
+[root@cloud01 script]# a=AAA.AAA.AAA ; echo ${a/%AAA/aaa} #替换结尾
+AAA.AAA.aaa
+[root@cloud01 script]# a=AAA.AAA.AAA ; echo ${a//%AAA/aaa} #错误用法
+AAA.AAA.AAA
+[root@cloud01 script]# a=AAA.AAA.AAA ; echo ${a//#AAA/aaa} #错误用法
+AAA.AAA.AAA
+    ```
+
+*   字符串大小写转换  
+    bash 有四个参数展开和 declare 命令的两个选项来支持大小写转换  
+    
+    `${parameter„}` 把 parameter 的值`全部`展开成小写字母  
+    `${parameter,}` 仅仅把 parameter 的`第一个字符`展开成小写字母  
+    `${parameterˆˆ}` 把 parameter 的值`全部`转换成大写字母  
+    `${parameterˆ}` 仅仅把 parameter 的`第一个字符`转换成大写字母（首字母大写）
+    
+    ```shell
+[root@cloud01 script]# lab () {
+> if [[ $1 ]]; then echo ${1,,}; echo ${1,}; echo ${1^^}; echo ${1^}; fi
+> }
+[root@cloud01 script]# lab aaa
+aaa
+aaa
+AAA
+Aaa
+[root@cloud01 script]# lab AAA
+aaa
+aAA
+AAA
+AAA
+    ```
 
 
 
 ---
 ###其他
 
-*   定义函数
+*   定义函数  
+    name 是函数名，commands 是一系列包含在函数中的命令,return 命令终止这个函数
 
     ```shell
-fuction_name () {
-    command
+name () {
+    commands
+    return
+}
+
+function name {
+    commands
+    return
 }
     ```
 
