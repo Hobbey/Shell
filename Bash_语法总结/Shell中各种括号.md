@@ -1,12 +1,25 @@
 ##Shell 各种括号 `( ) (( )) [ ] [[ ]] { }`
 
-###`( )`
+1.  [( )] (#jump1)
+    1.  [命令或管道替换] (#jump11)
+    2.  [数组多个值赋值] (#jump12)
+    3.  [子Shell] (#jump13)
+2.  [(( ))] (#jump2)
+    1.  [整型计算器] (#jump21)
+3.  [[ ]] (#jump3)
+4.  [[[ ]]] (#jump4)
+5.  [{ }] (#jump5)
+6.  [其他] (#jump6)
 
-*   命令或管道替换  
-    加$表示 用命令或管道执行的结果,代替 $( ) 结构  
-    $(command) 等同于 \`command\`
 
-    ```shell
+<h3 id="jump1">( )</h3>
+
+<h4 id="jump11">命令或管道替换</h4>
+
+加$表示 用命令或管道执行的结果,代替 $( ) 结构  
+$(command) 等同于 \`command\`
+
+```shell
 [root@cloud01 script]# seq 1
 1
 [root@cloud01 script]# $(seq 1)
@@ -19,26 +32,29 @@
 -bash: 731: command not found
 [root@cloud01 script]# `ps -ef | grep sshd | awk '{print $2}' | head -n 1`
 -bash: 731: command not found
-    ```
+```
 
-*   数组多个值赋值,从0开始填充  
+<h4 id="jump12">数组多个值赋值</h4>
 
-    ```shell
+从0开始填充  
+
+```shell
 [root@cloud01 script]#  aaa=(a b c d)
 [root@cloud01 script]# for i in ${aaa[*]}; do echo $i; done
 a
 b
 c
 d
-    ```
+```
 
-*   子Shell  
-    把多个命令组合在一起,经常用于 **把几个命令的输出结果合并成一个流** 并与 **管道** 相结合  
-    括号中的命令将会新开一个子shell顺序执行  
-    命令之间用分号隔开,最后一个命令可以没有分号,各命令和括号之间不必有空格  
-    (command;command;command;command)
+<h4 id="jump13">子Shell</h4>
 
-    ```shell
+把多个命令组合在一起,经常用于 **把几个命令的输出结果合并成一个流** 并与 **管道** 相结合  
+括号中的命令将会新开一个子shell顺序执行  
+命令之间用分号隔开,最后一个命令可以没有分号,各命令和括号之间不必有空格  
+(command;command;command;command)
+
+```shell
 [root@cloud01 script]# touch {1..5}.txt && ls
 1.txt  2.txt  3.txt  4.txt  5.txt
 [root@cloud01 script]# touch {1..5}.txt | ls 2.txt
@@ -51,21 +67,23 @@ d
 0 -rw-r--r--. 1 root root 0 Dec 25 16:23 2.txt
 0 -rw-r--r--. 1 root root 0 Dec 25 16:23 3.txt
 0 -rw-r--r--. 1 root root 0 Dec 25 16:23 5.txt
-    ```
+```
 
 ---
-###`(( ))`
+<h3 id="jump2">(( ))</h3>
+
 变量不用加$  
 为整数设计
 
-*   整型计算器  
-    支持 `+ - * / ** % ( )`  
-    以及仅对变量生效的:`+= -= *= /= %= ++a --a a++ a--` 均等价于 parameter = parameter + value 形式  
-    支持位运算符 `~ << >> & | ^`  
-    支持不同进制计算 `base#number` 表示number 以 base 为底  
-    加$表示用计算的结果代替 $(( )) 结构
+<h4 id="jump21">整型计算器</h4>
 
-    ```shell
+支持 `+ - * / ** % ( )`  
+以及仅对变量生效的:`+= -= *= /= %= ++a --a a++ a--` 均等价于 parameter = parameter + value 形式  
+支持位运算符 `~ << >> & | ^`  
+支持不同进制计算 `base#number` 表示number 以 base 为底  
+加$表示用计算的结果代替 $(( )) 结构
+
+```shell
 [root@cloud01 script]# ((2+2)) #完成一个计算
 [root@cloud01 script]# $((2+2)) #用计算的结果代替 $(( )) 结构
 -bash: 4: command not found
@@ -101,7 +119,7 @@ d
 16
 32
 64
-    ```
+```
 
 *   整型判断  
     支持 `> >=  < <=  == !=`  
@@ -155,7 +173,7 @@ True
     ```
 
 ---
-###`[ ]`
+<h3 id="jump3">[ ]</h3>
 变量需要加$  
 需要留空格,即[ expression ],而[ expression] 是语法错误  
 变量最好用"引号"引起来  
@@ -234,7 +252,8 @@ aaaa
     ```
 
 ---
-###`[[ ]]`
+<h3 id="jump4">[[ ]]</h3>
+
 变量需要加$  
 需要留空格,即[[ expression ]],而[[ expression]] 是语法错误  
 匹配字符串或通配符不需要引号  
@@ -260,7 +279,7 @@ Y
     ```
 
 ---
-###`{ }`
+<h3 id="jump5">{ }</h3>
 
 *   花括号/大括号展开  
     大括号中，不允许有空白  
@@ -480,7 +499,7 @@ AAA
 
 
 ---
-###其他
+<h3 id="jump6">其他</h3>
 
 *   定义函数  
     name 是函数名，commands 是一系列包含在函数中的命令,return 命令终止这个函数
