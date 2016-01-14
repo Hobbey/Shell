@@ -1,5 +1,7 @@
 ##Shell 各种括号 `( ) (( )) [ ] [[ ]] { }`
 
+<h3 id="jump0">TOC:</h3>
+
 1.  [( )] (#jump1)
     1.  [命令或管道替换] (#jump11)
     2.  [数组多个值赋值] (#jump12)
@@ -31,6 +33,7 @@
     1.  [定义函数] (#jump61)
 
 ---
+
 <h3 id="jump1">( )</h3>
 
 <h4 id="jump11">命令或管道替换</h4>
@@ -52,6 +55,7 @@ $(command) 等同于 \`command\`
 [root@cloud01 script]# `ps -ef | grep sshd | awk '{print $2}' | head -n 1`
 -bash: 731: command not found
 ```
+[Back to TOC ↑] (#jump0)
 
 <h4 id="jump12">数组多个值赋值</h4>
 
@@ -65,6 +69,7 @@ b
 c
 d
 ```
+[Back to TOC ↑] (#jump0)
 
 <h4 id="jump13">子Shell</h4>
 
@@ -87,8 +92,8 @@ d
 0 -rw-r--r--. 1 root root 0 Dec 25 16:23 3.txt
 0 -rw-r--r--. 1 root root 0 Dec 25 16:23 5.txt
 ```
+[Back to TOC ↑] (#jump0)
 
----
 <h3 id="jump2">(( ))</h3>
 
 变量不用加$  
@@ -139,6 +144,7 @@ d
 32
 64
 ```
+[Back to TOC ↑] (#jump0)
 
 <h4 id="jump22">整型判断</h4>
 
@@ -155,6 +161,7 @@ $a is even.
 [root@cloud01 script]# if (( foo = 5 ));then echo "It is true"; fi #这里是赋值,不是判断,所以永远成功,且赋值为5
 It is true
 ```
+[Back to TOC ↑] (#jump0)
 
 <h4 id="jump23">判断算式的结果是否为0</h4>
 
@@ -172,6 +179,7 @@ False
 [root@cloud01 script]# if (( 2 - 3 )) ; then echo "True" ; else echo "False" ; fi
 True
 ```
+[Back to TOC ↑] (#jump0)
 
 <h4 id="jump24">其他用法</h4>
 
@@ -194,8 +202,8 @@ expr1?expr2:expr3 条件（三元）运算符。若表达式 expr1 的计算结�
 -bash: ((: a<1?a+=1:a-=1: attempted assignment to non-variable (error token is "-=1")
 1
 ```
+[Back to TOC ↑] (#jump0)
 
----
 <h3 id="jump3">[ ]</h3>
 
 变量需要加$  
@@ -233,6 +241,7 @@ file not exists
 [root@cloud01 script]# if [ -e $AAAA ]; then echo "file exists" ; else echo "file not exists" ; fi #结果错误,用引号把参数引起来能确保了操作符之后总是跟随着一个字符串，即使字符串为空
 file exists
 ```
+[Back to TOC ↑] (#jump0)
 
 <h4 id="jump32">正则通配符</h4>
 
@@ -267,6 +276,7 @@ b
 c
 A
 ```
+[Back to TOC ↑] (#jump0)
 
 <h4 id="jump33">数组的索引</h4>
   
@@ -278,8 +288,8 @@ A
 [root@cloud01 script]# a[0]=aaaa ; echo ${a[@]}
 aaaa
 ```
+[Back to TOC ↑] (#jump0)
 
----
 <h3 id="jump4">[[ ]]</h3>
 
 变量需要加$  
@@ -299,6 +309,8 @@ True
 [root@cloud01 script]# a=6 ; if [[ a =~ [0-9] ]] ; then echo "True" ; else echo "False" ; fi #变量需要加$
 False
 ```
+[Back to TOC ↑] (#jump0)
+
 <h4 id="jump42">增加字符串支持类型匹配</h4>
 
 增加 `==` 操作符支持  
@@ -308,8 +320,8 @@ False
 [root@cloud01 script]# FILE=1.txt ; if [[ $FILE == *.txt ]] ; then echo Y ; else echo N ; fi
 Y
 ```
+[Back to TOC ↑] (#jump0)
 
----
 <h3 id="jump5">{ }</h3>
 
 <h4 id="jump51">花括号/大括号展开</h4>
@@ -325,6 +337,8 @@ Y
 [root@cloud01 script]# ls {1..4}.txt
 1.txt  2.txt  3.txt  4.txt
 ```
+[Back to TOC ↑] (#jump0)
+
 <h4 id="jump52">基本变量</h4>
  
 若变量名与其他文本相邻,则可界定变量名范围  
@@ -334,12 +348,15 @@ Y
 [root@cloud01 script]# a="AAA" ; echo "${a}_file"
 AAA_file
 ```
+[Back to TOC ↑] (#jump0)
 
 <h4 id="jump53">组命令</h4>
  
 大括号里的组命令不会新开一个子shell运行  
 大括号与命令之间必须有一个空格，并且最后一个命令必须用一个分号或者一个换行符终止  
 { command1; command2; command3; }
+
+[Back to TOC ↑] (#jump0)
 
 <h4 id="jump54">处理不存在和空变量的参数展开</h4>
 
@@ -397,6 +414,7 @@ Y
 [root@cloud01 script]# d=ddd ; echo ${d:+DDD} #变量非空  则用word替换
 DDD
 ```
+[Back to TOC ↑] (#jump0)
 
 <h4 id="jump55">返回变量名的参数展开</h4>
 
@@ -410,6 +428,7 @@ shell 具有返回变量名的能力
 [root@cloud01 script]# echo ${!aaa*}
 aaa1 aaa2
 ```
+[Back to TOC ↑] (#jump0)
 
 <h4 id="jump56">返回字符串长度个数</h4>
 
@@ -426,6 +445,7 @@ aaa1 aaa2
 [root@cloud01 script]# lab 1 1 1 1
 4
 ```
+[Back to TOC ↑] (#jump0)
 
 <h4 id="jump57">字符串提取</h4>
 
@@ -455,6 +475,7 @@ length，若出现则必须不能小于零
 [root@cloud01 script]# lab 11111 22222 33333 44444 55555 66666 #包括第二个位置变量
 22222 33333 44444
 ```
+[Back to TOC ↑] (#jump0)
 
 <h4 id="jump58">字符串部分删除</h4>
  
@@ -480,6 +501,7 @@ file.tar
 [root@cloud01 script]# a=file.tar.bz2 ; echo ${a%%.*} # 匹配到".tar.bz2" ,删除末尾部分
 file
 ```
+[Back to TOC ↑] (#jump0)
 
 <h4 id="jump59">字符串查找替换</h4>
 
@@ -508,6 +530,7 @@ AAA.AAA.AAA
 [root@cloud01 script]# a=AAA.AAA.AAA ; echo ${a//#AAA/aaa} #错误用法
 AAA.AAA.AAA
 ```
+[Back to TOC ↑] (#jump0)
 
 <h4 id="jump510">字符串大小写转换</h4>
   
@@ -533,8 +556,8 @@ aAA
 AAA
 AAA
 ```
+[Back to TOC ↑] (#jump0)
 
----
 <h3 id="jump6">其他</h3>
 
 <h4 id="jump61">定义函数</h4>
@@ -552,3 +575,4 @@ function name {
     return
 }
 ```
+[Back to TOC ↑] (#jump0)
