@@ -8,6 +8,7 @@ DATE="$(date +%Y-%m-%d_%H_%M_%S)"
 usage () {
     echo "$(basename $0):"
     echo "1 | start                    :jboss_start"
+    echo "1 | start -s                 :jboss_start without tail -f nohup.out"
     echo "2 | stop                     :jboss_stop"
     echo "3 | update                   :jboss_update"
     echo "4 | rollback                 :list old version"
@@ -28,6 +29,7 @@ check_jboss_running () {
 #    echo -e "check_jboss_running_status:${check_jboss_running_status}"
 }
 
+#希望手动使用脚本的时候默认tail -f,而又能用参数的形式禁止 tail -f 方便脚本调用
 jboss_start () {
     if [[ $check_jboss_running_status -eq 1 ]]; then #避免重复启动
         echo "${JBOSS_DIR} is running" #区分一台机器上的多个jboss
@@ -35,8 +37,12 @@ jboss_start () {
     else
         cd ${JBOSS_DIR}/bin/
         nohup ./standalone.sh >> nohup.out 2>&1 &
-        sleep 2
-        tail -f nohup.out
+        if [[ "$1" == "-s" ]]; then
+            return
+        else
+            sleep 2
+            tail -f nohup.out
+        fi
     fi
 }
 
@@ -91,7 +97,7 @@ check_jboss_running
 
 case $1 in
     1 | start)
-        jboss_start
+        jboss_start $2
         ;;
     2 | stop)
         jboss_stop
