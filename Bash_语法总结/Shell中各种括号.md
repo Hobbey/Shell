@@ -452,27 +452,27 @@ aaa1 aaa2
 `${parameter:offset}`  
 `${parameter:offset:length}`  
 从 parameter 所包含的字符串中提取一部分字符  
-提取的字符`始于第 offset 个字符`（从字符串开头算起）直到字符串的末尾，或指定提取的长度 length  
-若 offset 的值为`负数`，则认为 offset 值是从字符串的末尾开始算起,截取方向仍然是向后  
+`offset`是提取开始的位置,`length`是要提取的长度  
+`offset`有两种计算方式,从前往后,第一位是0,第二位1.....,也可以从后往前数,最后一位是-1,倒数第二位是-2....  
 注意: 负数前面必须有一个空格 为防止与 ${parameter:-word} 展开形式混淆  
-length，若出现则必须不能小于零  
+不管`offset`用哪种方式确定开始提取的坐标,`length`都始终代表#向后提取#的字符长度,这也就意味着`length`只能是正数  
 如果 parameter 是 `@`，展开结果是 length 个位置参数，从`第 offset 个`位置参数开始 截取 length 个位置参数结束
 
 ```shell
-[root@cloud01 script]# a=123456789 ; echo ${a:2}
-3456789
-[root@cloud01 script]# a=123456789 ; echo ${a:2:2} #起始于第二个字符,但是不包括第二个字符
-34
-[root@cloud01 script]# a=123456789 ; echo ${a: -2:1}
-8
-[root@cloud01 script]# a=123456789 ; echo ${a: -2:2}
-89
-[root@cloud01 script]# a=123456789 ; echo ${a: -2:3}
-89
+[root@cloud01 script]# a=abcdefg ; echo ${a:0:2} #提取前两个字符
+ab
+[root@cloud01 script]# a=abcdefg ; echo ${a: -2:2} #后两个
+fg
+[root@cloud01 script]# a=abcdefg ; echo ${a: -2:3} #length超过parameter长度,就提取到结尾为止
+fg
+[root@cloud01 script]# a=abcdefg ; echo ${a:2} #从正数第三个位置到结尾
+cdefg
+[root@cloud01 script]# a=abcdefg ; echo ${a:2:3}
+cde
 [root@cloud01 script]# lab () {
 > echo ${@:2:3}
 > }
-[root@cloud01 script]# lab 11111 22222 33333 44444 55555 66666 #包括第二个位置变量
+[root@cloud01 script]# lab 11111 22222 33333 44444 55555 66666 #6个位置变量 大概是对于shell函数来讲,变量从$1开始 所以第二个变量就是22222,从它开始提取三个变量
 22222 33333 44444
 ```
 [Back to TOC ↑] (#jump0)
