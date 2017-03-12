@@ -7,7 +7,7 @@ disk_check () {
     
     #####
     disk_check_disk_used=0
-    for i in $(df -hP | tail -n +2 | grep -v tmpfs | grep -v boot | awk '{print $5}' | sed 's/%//g'); do
+    for i in $(df -hP | tail -n +2 | grep -v tmpfs | grep -v boot | grep -v grep | awk '{print $5}' | sed 's/%//g'); do
         if [[ $i -gt disk_check_disk_used ]]; then
             disk_check_disk_used=$i
         fi
